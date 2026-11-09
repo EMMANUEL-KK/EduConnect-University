@@ -1,0 +1,741 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EduConnect University | Portail Académique Intelligent{% endblock %}
+
+{% block body %}
+
+<style>
+    :root {
+        --primary-red: #c1272d;
+        --dark-bg: #0b1329;
+        --card-bg: rgba(15, 23, 42, 0.85);
+        --card-border: rgba(255, 255, 255, 0.08);
+    }
+
+    body {
+        margin: 0;
+        background: var(--dark-bg);
+        background-image: 
+            radial-gradient(circle at 50% 10%, rgba(193, 39, 45, 0.15) 0%, transparent 50%),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 100 100'%3E%3Cpath d='M50 0 L61 35 L98 35 L68 57 L79 91 L50 70 L21 91 L32 57 L2 35 L39 35 Z' fill='%23ffffff' fill-opacity='0.02'/%3E%3C/svg%3E");
+        background-attachment: fixed;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        color: #f8fafc;
+        overflow-x: hidden;
+    }
+
+    @keyframes pulseGlow {
+        0% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.03); opacity: 1; }
+        100% { transform: scale(1); opacity: 0.8; }
+    }
+
+    .navbar {
+        background: rgba(11, 19, 41, 0.9);
+        backdrop-filter: blur(15px);
+        padding: 18px 6%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--card-border);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .logo {
+        font-size: 24px;
+        font-weight: 800;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+    .logo span { color: var(--primary-red); }
+
+    .nav-links a {
+        margin-left: 20px;
+        text-decoration: none;
+        color: #94a3b8;
+        font-weight: 600;
+        font-size: 14px;
+        transition: color 0.2s;
+        cursor: pointer;
+    }
+
+    .nav-links a:hover { color: #ffffff; }
+
+    .btn-login {
+        background: var(--primary-red);
+        color: white !important;
+        padding: 8px 18px;
+        border-radius: 8px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(193, 39, 45, 0.3);
+    }
+
+    .btn-login:hover {
+        background: #a51d23;
+        transform: translateY(-2px);
+    }
+
+    /* Vues dynamiques (Accueil, Login, Live) */
+    .page-view { display: none; }
+    .page-view.active-view { display: block; }
+
+    .hero {
+        margin: 30px auto 20px auto;
+        width: 90%;
+        padding: 40px 5%;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        border: 1px solid var(--card-border);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 40px;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        animation: pulseGlow 8s infinite ease-in-out;
+    }
+
+    .hero-content h2 {
+        font-size: 14px;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+    }
+
+    .hero-content h1 {
+        font-size: 34px;
+        line-height: 1.25;
+        margin-bottom: 15px;
+        color: #ffffff;
+    }
+
+    .sub-title-red { color: var(--primary-red); font-weight: 700; }
+
+    .dynamic-job {
+        color: #38bdf8;
+        display: inline-block;
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        border-bottom: 3px solid #38bdf8;
+        padding-bottom: 2px;
+    }
+
+    .dynamic-job.fade-out { opacity: 0; transform: translateY(-10px); }
+    .dynamic-job.fade-in { opacity: 1; transform: translateY(0); }
+
+    .hero-content p {
+        color: #cbd5e1;
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: 20px;
+    }
+
+    .hero-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .badge-tag {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .badge-tag:hover, .badge-tag.active {
+        background: var(--primary-red);
+        border-color: var(--primary-red);
+        transform: translateY(-2px);
+    }
+
+    .cycles-bar {
+        width: 90%;
+        margin: 0 auto 40px auto;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .cycles-title {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #94a3b8;
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+
+    .cycles-grid {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .cycle-btn {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .cycle-btn:hover {
+        background: var(--primary-red);
+        border-color: var(--primary-red);
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(193, 39, 45, 0.3);
+    }
+
+    .dept-slider-container {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 14px;
+        padding: 15px;
+        border: 1px solid var(--card-border);
+    }
+
+    .dept-slider-card {
+        background: #0f172a;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--card-border);
+        transition: transform 0.3s;
+    }
+
+    .dept-slider-card:hover { transform: scale(1.02); }
+
+    .dept-slider-card img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1), filter 0.5s ease;
+    }
+
+    .dept-slider-card img.anim-rotate { animation: rotate3D 6s infinite alternate ease-in-out; }
+    .dept-slider-card img.anim-zoom { animation: pulseZoom 5s infinite alternate ease-in-out; }
+    .dept-slider-card img.anim-pan { animation: panImage 7s infinite alternate ease-in-out; }
+
+    @keyframes rotate3D {
+        0% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+        100% { transform: scale(1.08) rotate(2deg); filter: brightness(1.15) drop-shadow(0 0 10px rgba(56,189,248,0.4)); }
+    }
+
+    @keyframes pulseZoom {
+        0% { transform: scale(1); }
+        100% { transform: scale(1.1); filter: contrast(1.1); }
+    }
+
+    @keyframes panImage {
+        0% { transform: scale(1.05) translate(0, 0); }
+        100% { transform: scale(1.05) translate(-2%, -2%); }
+    }
+
+    .dept-slider-info { padding: 15px; }
+
+    .dept-slider-info h3 {
+        font-size: 15px;
+        margin: 0 0 6px 0;
+        color: #38bdf8;
+    }
+
+    .dept-slider-info p {
+        font-size: 12px;
+        color: #94a3b8;
+        margin: 0 0 10px 0;
+    }
+
+    .sub-filieres-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+
+    .sub-filiere-badge {
+        background: rgba(56, 189, 248, 0.1);
+        color: #38bdf8;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 4px;
+        border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .btn-dept-action {
+        display: inline-block;
+        background: rgba(56, 189, 248, 0.15);
+        color: #38bdf8;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        transition: all 0.2s;
+    }
+
+    .btn-dept-action:hover { background: #38bdf8; color: #0f172a; }
+
+    .section { width: 90%; margin: 50px auto; }
+    .section-title { font-size: 22px; font-weight: 700; margin-bottom: 25px; }
+
+    .announcements-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+    }
+
+    .announcement-card {
+        background: var(--card-bg);
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid var(--card-border);
+        transition: all 0.35s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .announcement-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(193, 39, 45, 0.2);
+        border-color: rgba(193, 39, 45, 0.5);
+    }
+
+    .announcement-img { height: 120px; width: 100%; object-fit: cover; }
+    .announcement-body { padding: 16px; display: flex; flex-direction: column; flex-grow: 1; }
+    .announcement-tag { font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase; margin-bottom: 6px; }
+    .announcement-body h4 { font-size: 14px; margin: 0 0 8px 0; color: #ffffff; line-height: 1.4; }
+    .announcement-body p { font-size: 12px; color: #94a3b8; margin: 0 0 12px 0; line-height: 1.4; flex-grow: 1; }
+    .announcement-link { color: var(--primary-red); text-decoration: none; font-size: 12px; font-weight: 600; }
+
+    /* OFFRES DE STAGES & PFE */
+    .stages-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    .stage-card {
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        border-radius: 14px;
+        padding: 20px;
+        transition: transform 0.3s;
+    }
+    .stage-card:hover { transform: translateY(-5px); border-color: #38bdf8; }
+    .stage-tag { background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+
+    /* Bibliothèque & Onde boursière */
+    .library-section {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.7) 0%, rgba(11, 19, 41, 0.95) 100%);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        padding: 40px 4%;
+        margin-top: 60px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    }
+
+    @keyframes waveBounce {
+        0% { transform: translateY(0px) scale(1); }
+        25% { transform: translateY(-15px) scale(1.02); }
+        50% { transform: translateY(0px) scale(1); }
+        75% { transform: translateY(15px) scale(0.98); }
+        100% { transform: translateY(0px) scale(1); }
+    }
+
+    .books-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        padding: 20px 0;
+    }
+
+    .book-card {
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        transition: all 0.3s ease;
+        animation: waveBounce 6s infinite ease-in-out;
+    }
+    .book-card:nth-child(1) { animation-delay: 0s; }
+    .book-card:nth-child(2) { animation-delay: 1s; }
+    .book-card:nth-child(3) { animation-delay: 2s; }
+    .book-card:nth-child(4) { animation-delay: 3s; }
+    .book-card:nth-child(5) { animation-delay: 4s; }
+
+    .book-cover { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+    .book-dept { font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase; margin-bottom: 4px; }
+    .book-title { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 6px; height: 30px; overflow: hidden; }
+    .btn-download-pdf { display: block; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 5px; border-radius: 6px; font-size: 11px; text-decoration: none; }
+    .btn-download-pdf:hover { background: #38bdf8; color: #0f172a; }
+
+    /* Page Login & Live styles unifiés */
+    .auth-container {
+        max-width: 450px;
+        margin: 60px auto;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+    .form-control { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); padding: 12px; border-radius: 10px; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
+    
+    .live-page-wrap {
+        min-height: 80vh;
+        background-image: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.04) 0%, transparent 60%),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 5 C15 5 5 15 5 30 C5 35 7 40 10 45 L8 52 L15 50 C20 53 25 55 30 55 C45 55 55 45 55 30 C55 15 45 5 30 5 Z' fill='%23ffffff' fill-opacity='0.02'/%3E%3C/svg%3E");
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 40px 20px;
+    }
+</style>
+
+<!-- NAVIGATION UNIFIÉE -->
+<header class="navbar">
+    <div class="logo" onclick="switchView('home')">
+        <span>★</span> EduConnect University
+    </div>
+    <nav class="nav-links">
+        <a onclick="switchView('home')">Accueil</a>
+        <a onclick="switchView('home')">Annonces</a>
+        <a onclick="switchView('live')" style="color:#38bdf8;">🎥 Live Classes</a>
+        <a class="btn-login" onclick="switchView('login')">Connexion Espace</a>
+    </nav>
+</header>
+
+<!-- ================= 1. VUE ACCUEIL ================= -->
+<div id="view-home" class="page-view active-view">
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Année Universitaire 2026-2027</h2>
+            <h1>
+                EduConnect University<br>
+                <span class="sub-title-red">Faculté des Sciences & Technologies</span><br>
+                <span id="job-title" class="dynamic-job">Devenez mathématicien</span>
+            </h1>
+            <p>
+                Plateforme académique intelligente : chat multilingue par module, classes virtuelles en direct, 
+                et module automatisé de gestion des notes.
+            </p>
+            <div class="hero-badges">
+                <span class="badge-tag active" onclick="selectDept('math', 0)">Mathématiques</span>
+                <span class="badge-tag" onclick="selectDept('pc', 1)">Physique-Chimie</span>
+                <span class="badge-tag" onclick="selectDept('info', 2)">Informatique & IA</span>
+                <span class="badge-tag" onclick="selectDept('bio', 3)">Biologie</span>
+                <span class="badge-tag" onclick="selectDept('geo', 4)">Géologie</span>
+            </div>
+        </div>
+
+        <div class="dept-slider-container">
+            <div class="dept-slider-card">
+                <img id="dept-img" class="anim-rotate" src="https://i.pinimg.com/736x/dd/ae/af/ddaeaff76ac2ddcb40fc6fc75883b121.jpg" alt="Département">
+                <div class="dept-slider-info">
+                    <h3 id="dept-title">Département de Mathématiques</h3>
+                    <p id="dept-desc">Analyse avancée, algèbre, modélisation et structures algébriques.</p>
+                    <div id="sub-filieres" class="sub-filieres-tags">
+                        <span class="sub-filiere-badge">SMA</span>
+                        <span class="sub-filiere-badge">SMI</span>
+                    </div>
+                    <a href="#" class="btn-dept-action">Explorer les filières →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BARRE ACCÈS DIRECT AUX CYCLES -->
+    <div class="cycles-bar">
+        <div class="cycles-title">Accès direct aux cycles universitaires</div>
+        <div class="cycles-grid">
+            <a href="#" class="cycle-btn">Licence (LF)</a>
+            <a href="#" class="cycle-btn">Licence d'excellence (LE)</a>
+            <a href="#" class="cycle-btn">Master (MST)</a>
+            <a href="#" class="cycle-btn">Master d'excellence (ME)</a>
+            <a href="#" class="cycle-btn">Doctorat (CED)</a>
+        </div>
+    </div>
+
+    <!-- OFFRES DE STAGES & PFE -->
+    <section class="section">
+        <div class="section-title">💼 Offres de Stages & PFE Partenaires</div>
+        <div class="stages-grid">
+            <div class="stage-card">
+                <span class="stage-tag">Master Info & IA</span>
+                <h4 style="color:#fff; margin: 10px 0 5px 0;">Stage PFE : LLM & Fine-Tuning</h4>
+                <p style="color:#94a3b8; font-size:12px; margin:0 0 15px 0;">Entreprise partenaire : Tech Solutions Rabat • Durée : 6 mois</p>
+                <a href="#" class="announcement-link">Postuler avec Code Apogée →</a>
+            </div>
+            <div class="stage-card">
+                <span class="stage-tag">Master DSI / Big Data</span>
+                <h4 style="color:#fff; margin: 10px 0 5px 0;">Stage Ingénieur Data Pipeline</h4>
+                <p style="color:#94a3b8; font-size:12px; margin:0 0 15px 0;">Entreprise partenaire : DataCore Casablanca • Durée : 6 mois</p>
+                <a href="#" class="announcement-link">Postuler avec Code Apogée →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ANNONCES -->
+    <section class="section" id="annonces">
+        <div class="section-title">Dernières annonces universitaires</div>
+        <div class="announcements-grid">
+            <div class="announcement-card">
+                <img class="announcement-img" src="https://i.pinimg.com/736x/dd/ae/af/ddaeaff76ac2ddcb40fc6fc75883b121.jpg" alt="Maths">
+                <div class="announcement-body">
+                    <span class="announcement-tag">Mathématiques</span>
+                    <h4>Calendrier des examens du module d'analyse complexe S3</h4>
+                    <p>Affectations des salles et consignes pour la session d'hiver.</p>
+                    <a href="#" class="announcement-link">Lire la suite →</a>
+                </div>
+            </div>
+            <div class="announcement-card">
+                <img class="announcement-img" src="https://i.pinimg.com/736x/db/d2/ce/dbd2cebc9c2222d69f187108d13122d1.jpg" alt="Info">
+                <div class="announcement-body">
+                    <span class="announcement-tag">Informatique & IA</span>
+                    <h4>Nouvelles affectations en Master Informatique & IA (Master Info & Télécom, DSI)</h4>
+                    <p>Consultez les listes et répartitions des groupes de TP.</p>
+                    <a href="#" class="announcement-link">Lire la suite →</a>
+                </div>
+            </div>
+            <div class="announcement-card">
+                <img class="announcement-img" src="https://i.pinimg.com/736x/77/a1/1d/77a11d0e9c3073bc84f5a3ea1e3d7077.jpg" alt="Bio">
+                <div class="announcement-body">
+                    <span class="announcement-tag">Biologie & SVT</span>
+                    <h4>Résultats des examens et calendrier des soutenances</h4>
+                    <p>Publication des notes officielles avec module de contestation.</p>
+                    <a href="#" class="announcement-link">Lire la suite →</a>
+                </div>
+            </div>
+            <div class="announcement-card">
+                <img class="announcement-img" src="https://i.pinimg.com/736x/c2/49/cb/c249cb422cde59ae29b73db048cfc028.jpg" alt="PC">
+                <div class="announcement-body">
+                    <span class="announcement-tag">Physique-Chimie</span>
+                    <h4>Emplois du temps mis à jour : Semestre S2 et S4 (SMP & SMC)</h4>
+                    <p>Mise en place des salles virtuelles pour les modules.</p>
+                    <a href="#" class="announcement-link">Lire la suite →</a>
+                </div>
+            </div>
+            <div class="announcement-card">
+                <img class="announcement-img" src="https://i.pinimg.com/1200x/95/5e/92/955e92512b01b2f0dddaf292333ab213.jpg" alt="Geo">
+                <div class="announcement-body">
+                    <span class="announcement-tag">Géologie & Environnement</span>
+                    <h4>Sortie géologique programmée pour les étudiants de S3</h4>
+                    <p>Rassemblement devant le département ce vendredi à 08h00.</p>
+                    <a href="#" class="announcement-link">Lire la suite →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BIBLIOTHÈQUE NUMÉRIQUE -->
+    <section class="section">
+        <div class="library-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <h3 style="margin:0 0 5px 0; color:#fff;">📚 Bibliothèque Numérique & Bouquets d'Ouvrages</h3>
+                    <p style="margin:0; color:#94a3b8; font-size:13px;">Manuels et ressources classés par département en défilement dynamique.</p>
+                </div>
+            </div>
+            <div class="books-container">
+                <div class="book-card">
+                    <img class="book-cover" src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80" alt="Livre">
+                    <div class="book-dept">Mathématiques</div>
+                    <div class="book-title">Analyse Avancée & Algèbre</div>
+                    <a href="#" class="btn-download-pdf">📖 Consulter PDF</a>
+                </div>
+                <div class="book-card">
+                    <img class="book-cover" src="https://i.pinimg.com/736x/db/d2/ce/dbd2cebc9c2222d69f187108d13122d1.jpg" alt="Livre">
+                    <div class="book-dept">Informatique & IA</div>
+                    <div class="book-title">Architectures Symfony & Big Data</div>
+                    <a href="#" class="btn-download-pdf">📖 Consulter PDF</a>
+                </div>
+                <div class="book-card">
+                    <img class="book-cover" src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=400&q=80" alt="Livre">
+                    <div class="book-dept">Biologie</div>
+                    <div class="book-title">Génétique Moléculaire</div>
+                    <a href="#" class="btn-download-pdf">📖 Consulter PDF</a>
+                </div>
+                <div class="book-card">
+                    <img class="book-cover" src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80" alt="Livre">
+                    <div class="book-dept">Physique-Chimie</div>
+                    <div class="book-title">Mécanique Quantique</div>
+                    <a href="#" class="btn-download-pdf">📖 Consulter PDF</a>
+                </div>
+                <div class="book-card">
+                    <img class="book-cover" src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=400&q=80" alt="Livre">
+                    <div class="book-dept">Géologie</div>
+                    <div class="book-title">Cartographie 3D & Hydrogéologie</div>
+                    <a href="#" class="btn-download-pdf">📖 Consulter PDF</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ================= 2. VUE CONNEXION ================= -->
+<div id="view-login" class="page-view">
+    <div class="auth-container">
+        <div style="text-align:center; margin-bottom:25px;">
+            <h2 style="color:#fff; margin:0 0 5px 0;"><span>★</span> Connexion Espace</h2>
+            <p style="color:#94a3b8; font-size:13px; margin:0;">Accès sécurisé par CNI et Code Apogée</p>
+        </div>
+        <form>
+            <label style="display:block; font-size:13px; color:#cbd5e1; margin-bottom:5px;">Numéro de CNI</label>
+            <input type="text" class="form-control" placeholder="Ex: AB123456" required>
+            
+            <label style="display:block; font-size:13px; color:#cbd5e1; margin-bottom:5px;">Code Apogée</label>
+            <input type="password" class="form-control" placeholder="Ex: 21004589" required>
+            
+            <button type="submit" style="width:100%; background:var(--primary-red); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:700; cursor:pointer; margin-top:10px;">Se connecter</button>
+        </form>
+        <a onclick="switchView('home')" style="display:block; text-align:center; margin-top:20px; color:#94a3b8; font-size:13px; cursor:pointer;">← Retour à l'accueil</a>
+    </div>
+</div>
+
+<!-- ================= 3. VUE LIVE (FAÇON WHATSAPP & TEAMS) ================= -->
+<div id="view-live" class="page-view">
+    <div class="live-page-wrap">
+        <h1 style="font-size:32px; color:#fff; margin-bottom:10px;">Salles Virtuelles <span>Interactives</span></h1>
+        <p style="color:#94a3b8; max-width:600px; margin-bottom:40px; font-size:14px;">Choisissez votre profil pour lancer ou suivre les cours en direct avec chat intégré.</p>
+        
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:25px; width:100%; max-width:700px;">
+            <div style="background:rgba(15, 23, 42, 0.9); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:30px; text-align:center;">
+                <div style="font-size:35px; margin-bottom:15px;">👨‍🏫</div>
+                <h3 style="color:#fff; margin-bottom:10px;">Espace Professeur</h3>
+                <p style="color:#94a3b8; font-size:12px; margin-bottom:20px;">Lancez votre visio de cours magistral et partagez vos documents.</p>
+                <a style="display:block; background:var(--primary-red); color:#fff; padding:10px; border-radius:8px; text-decoration:none; font-weight:700; font-size:13px; cursor:pointer;">Lancer le live →</a>
+            </div>
+            
+            <div style="background:rgba(15, 23, 42, 0.9); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:30px; text-align:center;">
+                <div style="font-size:35px; margin-bottom:15px;">🎓</div>
+                <h3 style="color:#fff; margin-bottom:10px;">Espace Étudiant</h3>
+                <p style="color:#94a3b8; font-size:12px; margin-bottom:20px;">Rejoignez le flux vidéo et participez au chat de discussion.</p>
+                <a style="display:block; background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.3); padding:10px; border-radius:8px; text-decoration:none; font-weight:700; font-size:13px; cursor:pointer;">Suivre le cours →</a>
+            </div>
+        </div>
+        <a onclick="switchView('home')" style="margin-top:30px; color:#94a3b8; font-size:13px; cursor:pointer; text-decoration:underline;">← Retour à l'accueil</a>
+    </div>
+</div>
+
+<footer style="background:#070d1a; color:#64748b; padding:30px 6%; border-top:1px solid var(--card-border); text-align:center; font-size:13px; margin-top:60px;">
+    EduConnect University — FSDM & Technologies (2026-2027)
+</footer>
+
+<script>
+    function switchView(viewName) {
+        document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active-view'));
+        document.getElementById('view-' + viewName).classList.add('active-view');
+        window.scrollTo(0, 0);
+    }
+
+    const deptList = [
+        {
+            key: 'math',
+            job: "Devenez mathématicien",
+            title: "Département de Mathématiques",
+            desc: "Analyse avancée, algèbre, modélisation et structures algébriques.",
+            sub: ["SMA", "SMI", "Modélisation", "Statistiques"],
+            img: "https://i.pinimg.com/736x/dd/ae/af/ddaeaff76ac2ddcb40fc6fc75883b121.jpg",
+            anim: "anim-rotate"
+        },
+        {
+            key: 'pc',
+            job: "Devenez chimiste & physicien",
+            title: "Département de Physique-Chimie",
+            desc: "Mécanique quantique, optique, thermodynamique et chimie organique.",
+            sub: ["SMP", "SMC", "Énergétique", "Matériaux"],
+            img: "https://i.pinimg.com/736x/c2/49/cb/c249cb422cde59ae29b73db048cfc028.jpg",
+            anim: "anim-zoom"
+        },
+        {
+            key: 'info',
+            job: "Devenez informaticien",
+            title: "Département d'Informatique & IA",
+            desc: "Algorithmique, bases de données, architectures logicielles et intelligence artificielle.",
+            sub: ["Master Info & Télécom", "Master DSI / Big Data", "Génie Logiciel", "Cyber sécurité"],
+            // Image mise à jour ici également pour le slider dynamique
+            img: "https://i.pinimg.com/736x/db/d2/ce/dbd2cebc9c2222d69f187108d13122d1.jpg",
+            anim: "anim-pan"
+        },
+        {
+            key: 'bio',
+            job: "Devenez biologiste",
+            title: "Département de Biologie & SVT",
+            desc: "Génétique, biologie cellulaire, biochimie et écologie appliquée.",
+            sub: ["SVT", "Biochimie", "Génétique", "Ecologie"],
+            img: "https://i.pinimg.com/736x/77/a1/1d/77a11d0e9c3073bc84f5a3ea1e3d7077.jpg",
+            anim: "anim-rotate"
+        },
+        {
+            key: 'geo',
+            job: "Devenez géologue",
+            title: "Département de Géologie",
+            desc: "Tectonique, minéralogie, cartographie 3D et ressources en eau.",
+            sub: ["Stu", "Hydrogéologie", "Géophysique", "Ressources Minérales"],
+            img: "https://i.pinimg.com/1200x/95/5e/92/955e92512b01b2f0dddaf292333ab213.jpg",
+            anim: "anim-zoom"
+        }
+    ];
+
+    let currentIndex = 0;
+    const jobElement = document.getElementById('job-title');
+    const imgElement = document.getElementById('dept-img');
+    const subFilieresContainer = document.getElementById('sub-filieres');
+
+    function updateDisplay(index) {
+        currentIndex = index;
+        const currentData = deptList[currentIndex];
+
+        jobElement.classList.add('fade-out');
+        
+        setTimeout(() => {
+            jobElement.innerText = currentData.job;
+            jobElement.classList.remove('fade-out');
+            jobElement.classList.add('fade-in');
+
+            document.getElementById('dept-title').innerText = currentData.title;
+            document.getElementById('dept-desc').innerText = currentData.desc;
+            
+            subFilieresContainer.innerHTML = currentData.sub.map(s => `<span class="sub-filiere-badge">${s}</span>`).join('');
+
+            imgElement.src = currentData.img;
+            imgElement.className = currentData.anim;
+
+            const badges = document.querySelectorAll('.badge-tag');
+            badges.forEach((b, i) => {
+                if (i === currentIndex) b.classList.add('active');
+                else b.classList.remove('active');
+            });
+        }, 300);
+    }
+
+    let autoRotate = setInterval(() => {
+        let nextIndex = (currentIndex + 1) % deptList.length;
+        updateDisplay(nextIndex);
+    }, 3000);
+
+    function selectDept(key, index) {
+        clearInterval(autoRotate);
+        updateDisplay(index);
+        autoRotate = setInterval(() => {
+            let nextIndex = (currentIndex + 1) % deptList.length;
+            updateDisplay(nextIndex);
+        }, 3000);
+    }
+</script>
+
+{% endblock %}
